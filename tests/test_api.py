@@ -1,0 +1,73 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+import joblib
+from fastapi.testclient import TestClient
+
+from api import main
+
+
+def baseline_artifact() -> dict:
+    return {
+        "schema_version": 1,
+        "model_version": "test",
+        "champion": "persistence",
+        "feature_columns": ["volume_now"],
+        "horizon_hours": 1,
+        "target": "traffic_volume",
+        "units": "vehicles/hour",
+        "data_mode": "historical",
+        "source": "test source",
+        "source_period": {"start": "2024-01-01", "end": "2024-02-01"},
+        "location": {
+            "id": "test-road",
+            "name": "Test Road",
+            "region": "Test Region",
+            "latitude": 10.0,
+            "longitude": 20.0,
+        },
+        "latest_features": {"volume_now": 1234.0},
+        "latest_baselines": {"persistence": 1234.0, "seasonal": 1200.0},
+        "latest_issue_time": "2024-01-31T10:00:00",
+        "latest_target_time": "2024-01-31T11:00:00",
+        "evaluation": {"validation": {}, "test": {}},
+        "history": [
+            {"timestamp": "2024-01-31T11:00:00", "actual": 1200.0, "predicted": 1234.0}
+        ],
+    }
+
+
+def use_artifact(monkeypatch, path: Path) -> None:
+    monkeypatch.setattr(main, "store", main.ModelStore(path))
+
+
+def test_health_reports_missing_artifact(monkeypatch, tmp_path: Path) -> None:
+    use_artifact(monkeypatch, tmp_path / "missing.joblib")
+    response = TestClient(main.app).get("/health")
+    assert response.status_code == 200
+    assert response.json()["model_ready"] is False
+
+
+def test_latest_forecast_and_history(monkeypatch, tmp_path: Path) -> None:
+    artifact_path = tmp_path / "model.joblib"
+    joblib.dump(baseline_artifact(), artifact_path)
+    use_artifact(monkeypatch, artifact_path)
+    client = TestClient(main.app)
+
+    forecast = client.get("/api/v1/forecast/latest")
+    history = client.get("/api/v1/history?limit=1")
+
+    assert forecast.status_code == 200
+    assert forecast.json()["predicted_volume"] == 1234.0
+    assert forecast.json()["data_mode"] == "historical"
+    assert history.status_code == 200
+    assert history.json()[0]["actual"] == 1200.0
+
+
+def test_history_rejects_unsupported_limit(monkeypatch, tmp_path: Path) -> None:
+    artifact_path = tmp_path / "model.joblib"
+    joblib.dump(baseline_artifact(), artifact_path)
+    use_artifact(monkeypatch, artifact_path)
+    response = TestClient(main.app).get("/api/v1/history?limit=100")
+    assert response.status_code == 422
