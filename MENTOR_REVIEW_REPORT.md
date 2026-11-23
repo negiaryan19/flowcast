@@ -4,7 +4,7 @@
 **Project:** FlowCast — AI-Powered Smart Traffic Flow Prediction Platform  
 **Report date:** 23 November 2026  
 **Proposed project period:** 23 November–23 December 2026  
-**Report type:** Initial progress report and implementation proposal  
+**Report type:** Progress report and implementation proposal
 **Repository:** [negiaryan19/flowcast](https://github.com/negiaryan19/flowcast)
 
 ## Project summary
@@ -15,18 +15,18 @@ For the one-month internship delivery, the proposed core is a reproducible traff
 
 ## Current progress
 
-The repository has been initialized and the initial research and delivery roadmap have been prepared. The local inspection on 23 November found two existing commits and empty README, dependency, API, dashboard, and utility files. There is currently no implemented model, running application, test suite, or deployment in the inspected checkout.
+Development began on 23 November from a repository containing two initial commits and empty starter files. The active `codex/one-month-build` branch now contains the data pipeline, trained model, forecast API, responsive 3D dashboard, tests, and project documentation. The current implementation uses historical data locally and has not been deployed.
 
 | Work area | Current status | Next deliverable |
 | --- | --- | --- |
-| Scope and planning | Initial research and one-month plan prepared | Mentor feedback on scope |
-| Data | Candidate public sources identified | Download, quality audit, dataset documentation |
-| Machine learning | Not implemented | Baselines and chronological evaluation |
-| Backend | Empty starter file | Forecast API with input validation |
-| Frontend | Empty starter file | React dashboard with interactive 3D map |
-| Testing and deployment | Not implemented | Automated checks and reproducible demonstration |
+| Scope and planning | One-month plan and mentor report prepared | Mentor feedback on scope |
+| Data | Reproducible UCI download, cleaning, features and dataset card implemented | Review duplicate and missing-period policy |
+| Machine learning | Persistence, weekly baseline and gradient boosting evaluated | Mentor review of results and error analysis |
+| Backend | FastAPI metadata, forecast and replay endpoints implemented | Add deployment configuration after hosting decision |
+| Frontend | Responsive React dashboard with MapLibre 3D scene implemented | Extend interaction after mentor review |
+| Testing and delivery | Eight backend tests, Python lint, TypeScript check, production build and npm audit pass locally | Run GitHub Actions and deploy or record local demo |
 
-No accuracy, response-time, business-impact, or revenue results have been measured yet. All performance criteria below are planned targets.
+The untouched chronological test period contains 4,129 prepared observations from April to September 2018. Gradient boosting achieved MAE 136.83 vehicles/hour and RMSE 207.28. The weekly seasonal baseline achieved MAE 297.72 and RMSE 618.19, so the model reduced test MAE by about 54%. These results measure historical forecast error for one corridor. Response time, local traffic generalization, operational impact, and revenue have not been measured.
 
 ## Objectives and proposed scope
 
@@ -52,18 +52,18 @@ The pipeline will audit data quality, resolve repeated timestamps, generate lagg
 
 Persistence and same-hour-last-week predictions will establish reference performance. A gradient boosting model will then be compared using mean absolute error (MAE) and root mean squared error (RMSE), including peak-hour error analysis. The final test period will remain untouched during model selection. If the learned model does not outperform the baseline, the result will be reported honestly and the stronger method will remain available.
 
-The proposed improvement target is at least 10% lower validation MAE than the stronger baseline. This is an experiment target, not a promised outcome or a requirement to suppress unfavorable results. Forecast intervals will be shown only if calibrated and evaluated.
+The proposed improvement target was at least 10% lower validation MAE than the stronger baseline. Gradient boosting recorded validation MAE 166.92, compared with 394.62 for the weekly seasonal baseline. Forecast intervals are still deferred until they can be calibrated and evaluated.
 
 ## Technical design and 3D experience
 
 | Layer | Proposed technology and responsibility |
 | --- | --- |
-| Data and modeling | Python, pandas and scikit-learn for cleaning, features, training and evaluation |
-| Backend | FastAPI for input validation and inference using a versioned model artifact |
-| Frontend | React, TypeScript and Vite for controls, charts and dashboard layout |
-| 3D mapping | MapLibre GL JS for map interaction and available building extrusion |
-| Storage | Local dataset/model files initially; additional database infrastructure only if justified |
-| Verification | Python tests, frontend type checking/build, API integration checks and browser checks |
+| Data and modeling | Implemented with Python, pandas and scikit-learn |
+| Backend | Implemented with FastAPI and a versioned local model artifact |
+| Frontend | Implemented with React, TypeScript and Vite |
+| 3D mapping | Implemented with MapLibre GL JS, OpenFreeMap tiles and building extrusion |
+| Storage | Local dataset and model files; additional database infrastructure remains conditional |
+| Verification | Python tests, lint, TypeScript checking, production build, dependency audit and browser review completed locally |
 
 Data will flow from ingestion and validation to feature generation, model training, evaluation, saved artifact, API, and dashboard. Training will remain separate from API requests.
 

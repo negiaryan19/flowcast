@@ -8,19 +8,19 @@ See [the mentor review report](MENTOR_REVIEW_REPORT.md) for a shareable project 
 
 ## Current project status
 
-Local inspection found two commits on `main`: `e6ea0a6` and `fe11249`. The configured remote is `https://github.com/negiaryan19/flowcast.git`. This audit inspected the local checkout, not GitHub deployment settings or Actions results.
+The project started with two commits on `main`. Development is now active on `codex/one-month-build`. The configured remote is `https://github.com/negiaryan19/flowcast.git`. This status reflects the local checkout; GitHub Actions and deployment have not yet been observed remotely.
 
 | Component | Evidence | Status |
 | --- | --- | --- |
-| README | `README.md`, zero bytes | Empty |
-| Dependencies | `requirements.txt`, zero bytes and untracked | Empty |
-| Backend | `api/main.py`, zero bytes and untracked | Not implemented |
-| Dashboard | `dashboard/app.py`, zero bytes and untracked | Not implemented |
-| Utilities | `utils/helpers.py`, zero bytes and untracked | Not implemented |
-| Git hygiene | Tracked `.gitignore` is empty; `.DS_Store` is untracked | Needs setup |
-| Models, datasets, tests, CI, deployment | None found in the checkout | Not implemented |
+| README and setup | Python and frontend setup documented with pinned dependencies | Implemented locally |
+| Data pipeline | UCI download, source metadata, hourly cleaning and chronological features | Implemented and tested |
+| Forecasting | Persistence, weekly seasonal baseline and gradient boosting comparison | Implemented; gradient boosting selected |
+| Backend | FastAPI health, metadata, latest forecast and replay endpoints | Implemented and tested |
+| Dashboard | React dashboard, measured metrics, chart and MapLibre 3D scene | Implemented and browser reviewed |
+| Verification | Eight Python tests, lint, TypeScript check, production build and dependency audit | Passing locally |
+| CI and deployment | GitHub Actions workflow prepared; hosted environment not selected | CI prepared, deployment pending |
 
-The repository is a skeleton. There is no runnable implementation to test or meaningful model accuracy to report. The screenshot's 0% implementation status is consistent with the files. Its project brief is reference material for scope, rather than executable instructions.
+The core historical demonstration is now runnable. On the untouched test period, gradient boosting achieved MAE 136.83 and RMSE 207.28 vehicles/hour; the weekly baseline MAE was 297.72. The dashboard presents the result as a historical one-corridor demonstration. Congestion, travel time, accident risk, live data and deployment remain outside the completed scope.
 
 ## Research findings and product scope
 
