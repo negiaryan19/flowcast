@@ -26,6 +26,7 @@ def baseline_artifact() -> dict:
             "region": "Test Region",
             "latitude": 10.0,
             "longitude": 20.0,
+            "coordinate_note": "Approximate test anchor",
         },
         "latest_features": {"volume_now": 1234.0},
         "latest_baselines": {"persistence": 1234.0, "seasonal": 1200.0},
