@@ -83,6 +83,7 @@ def train() -> dict:
             "region": "Minneapolis–St Paul, Minnesota, USA",
             "latitude": 44.9537,
             "longitude": -93.0900,
+            "coordinate_note": "Approximate corridor display anchor",
         },
         "latest_features": prepared.iloc[-1][FEATURE_COLUMNS].to_dict(),
         "latest_issue_time": prepared.index[-1].isoformat(),

@@ -31,6 +31,7 @@ class Location(BaseModel):
     region: str
     latitude: float
     longitude: float
+    coordinate_note: str | None = None
 
 
 class ForecastResponse(BaseModel):
