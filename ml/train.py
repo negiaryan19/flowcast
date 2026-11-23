@@ -97,6 +97,14 @@ def train() -> dict:
         ),
         "champion": metrics(split.test["target"], test_predictions),
     }
+    artifact["evaluation"] = {
+        "validation": validation_results,
+        "test": test_results,
+    }
+    artifact["latest_baselines"] = {
+        "persistence": float(prepared.iloc[-1]["persistence_baseline"]),
+        "seasonal": float(prepared.iloc[-1]["seasonal_baseline"]),
+    }
 
     history = split.test.tail(72).copy()
     history_predictions = predict_champion(artifact, history)
