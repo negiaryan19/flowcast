@@ -50,3 +50,14 @@ cd frontend && npm run check && npm run build
 The project uses [Metro Interstate Traffic Volume](https://archive.ics.uci.edu/dataset/492/metro+interstate+traffic+volume), donated by John Hogue to the UCI Machine Learning Repository. It contains hourly westbound I-94 traffic-volume observations for Minneapolis–St Paul from 2012–2018 with weather and holiday attributes. The dataset is licensed under CC BY 4.0.
 
 The demo represents that historical corridor and period. It does not represent live or local Indian traffic.
+
+## Measured result
+
+The current gradient boosting model was selected on a chronological validation period. On the untouched April–September 2018 test period it achieved MAE **136.83 vehicles/hour** and RMSE **207.28 vehicles/hour**. The weekly seasonal baseline recorded MAE **297.72 vehicles/hour**. Generated artifacts and evaluation JSON remain local and can be reproduced with `python -m ml.train`.
+
+## Project documents
+
+- [Mentor review report](MENTOR_REVIEW_REPORT.md)
+- [One-month roadmap](ROADMAP.md)
+- [Dataset card](docs/DATASET.md)
+- [Manual tasks for the project owner](docs/MANUAL_TASKS.md)
