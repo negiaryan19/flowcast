@@ -179,6 +179,7 @@ def model_metadata() -> dict[str, Any]:
         "evaluation_periods": artifact.get("evaluation_periods", {}),
         "row_counts": artifact.get("row_counts", {}),
         "error_analysis": artifact.get("error_analysis", {}),
+        "data_quality": artifact.get("data_quality", {}),
     }
 
 

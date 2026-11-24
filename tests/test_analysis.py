@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ml.analysis import segment_error_analysis
+from ml.analysis import data_quality_summary, segment_error_analysis
 
 
 def test_segment_analysis_counts_and_errors() -> None:
@@ -32,3 +32,20 @@ def test_segment_analysis_rejects_misaligned_predictions() -> None:
     )
     with pytest.raises(ValueError, match="align"):
         segment_error_analysis(frame, np.array([]))
+
+
+def test_data_quality_summary_distinguishes_rows_gaps_and_duplicates() -> None:
+    raw = pd.DataFrame(
+        {"date_time": ["2026-01-01 00:00", "2026-01-01 00:00", "2026-01-01 02:00"]}
+    )
+    hourly = pd.DataFrame({"observed": [True, False, True]})
+    prepared = pd.DataFrame(index=range(1))
+
+    assert data_quality_summary(raw, hourly, prepared) == {
+        "source_rows": 3,
+        "unique_source_timestamps": 2,
+        "duplicate_weather_rows_collapsed": 1,
+        "regular_hourly_slots": 3,
+        "missing_traffic_hours": 1,
+        "prepared_forecast_rows": 1,
+    }

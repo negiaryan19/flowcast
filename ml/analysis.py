@@ -34,3 +34,20 @@ def segment_error_analysis(frame: pd.DataFrame, predictions: np.ndarray) -> dict
         for name, mask in masks.items()
         if mask.any()
     }
+
+
+def data_quality_summary(
+    raw: pd.DataFrame, hourly: pd.DataFrame, prepared: pd.DataFrame
+) -> dict[str, int]:
+    """Summarize transformations without treating inserted gaps as source rows."""
+    timestamps = pd.to_datetime(raw["date_time"], errors="coerce").dropna()
+    unique_timestamps = int(timestamps.nunique())
+    observed_hours = int(hourly["observed"].sum())
+    return {
+        "source_rows": int(len(raw)),
+        "unique_source_timestamps": unique_timestamps,
+        "duplicate_weather_rows_collapsed": int(len(timestamps) - unique_timestamps),
+        "regular_hourly_slots": int(len(hourly)),
+        "missing_traffic_hours": int(len(hourly) - observed_hours),
+        "prepared_forecast_rows": int(len(prepared)),
+    }
