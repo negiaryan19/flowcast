@@ -70,6 +70,7 @@ The current gradient boosting model was selected on a chronological validation p
 - [One-month roadmap](ROADMAP.md)
 - [Dataset card](docs/DATASET.md)
 - [Manual tasks for the project owner](docs/MANUAL_TASKS.md)
+- [Mentor demo guide](docs/MENTOR_DEMO_GUIDE.md)
 
 ## Preview
 
