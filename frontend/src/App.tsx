@@ -4,6 +4,7 @@ import { Login } from "./components/Login";
 import { Brand, Icon } from "./components/Icons";
 import type { IconName } from "./components/Icons";
 import { TrafficChart } from "./components/TrafficChart";
+import { WeatherScenario } from "./components/WeatherScenario";
 import {
   downloadFile,
   exportHistory,
@@ -893,6 +894,7 @@ function Workspace({
                       at forecast issue time.
                     </p>
                   </section>
+                  <WeatherScenario />
                   <div className="two-columns">
                     <section className="panel">
                       <PanelTitle
