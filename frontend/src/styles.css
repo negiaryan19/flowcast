@@ -1711,8 +1711,12 @@ tbody tr:hover {
   color: #2c3b29;
   font: 500 1.25rem var(--mono);
 }
-.scenario-result .increase strong { color: #a55d2a; }
-.scenario-result .decrease strong { color: #58762f; }
+.scenario-result .increase strong {
+  color: #a55d2a;
+}
+.scenario-result .decrease strong {
+  color: #58762f;
+}
 .scenario-result p,
 .scenario-error {
   grid-column: 1 / -1;
@@ -1723,7 +1727,10 @@ tbody tr:hover {
   font-size: 0.75rem;
   line-height: 1.5;
 }
-.scenario-error { color: #a24735; background: #fff4f1; }
+.scenario-error {
+  color: #a24735;
+  background: #fff4f1;
+}
 .data-list {
   padding: 0 21px;
   margin: 0;
