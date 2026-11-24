@@ -2346,6 +2346,17 @@ tbody tr:hover {
   }
 }
 @media (max-width: 760px) {
+  .scenario-heading,
+  .scenario-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .scenario-inputs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .scenario-result > div {
+    padding: 13px 15px;
+  }
   .sidebar {
     transform: translateX(-100%);
     transition: transform 0.2s;
