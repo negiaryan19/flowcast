@@ -12,6 +12,7 @@ import pandas as pd
 from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
+from ml.analysis import segment_error_analysis
 from ml.data import FEATURE_COLUMNS, build_features, chronological_split, clean_hourly, load_raw
 from ml.download_data import CSV_PATH, download
 
@@ -63,7 +64,7 @@ def train() -> dict:
 
     artifact = {
         "schema_version": 1,
-        "model_version": "0.2.0",
+        "model_version": "0.3.0",
         "trained_at": datetime.now(UTC).isoformat(),
         "champion": champion,
         "model": model,
@@ -102,6 +103,7 @@ def train() -> dict:
         "validation": validation_results,
         "test": test_results,
     }
+    artifact["error_analysis"] = segment_error_analysis(split.test, test_predictions)
     artifact["latest_baselines"] = {
         "persistence": float(prepared.iloc[-1]["persistence_baseline"]),
         "seasonal": float(prepared.iloc[-1]["seasonal_baseline"]),
@@ -138,6 +140,7 @@ def train() -> dict:
         "validation": validation_results,
         "champion": champion,
         "test": test_results,
+        "error_analysis": artifact["error_analysis"],
     }
 
     artifact["evaluation_periods"] = report["periods"]
