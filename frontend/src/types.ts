@@ -27,6 +27,7 @@ export type HistoryPoint = {
 };
 
 type Metric = { mae: number; rmse: number };
+type SegmentMetric = Metric & { observations: number };
 
 export type ModelMetadata = {
   model_version: string;
@@ -45,6 +46,7 @@ export type ModelMetadata = {
   feature_count: number;
   evaluation_periods?: Record<string, string[]>;
   row_counts?: Record<string, number>;
+  error_analysis?: Record<string, SegmentMetric>;
 };
 
 export type User = { id: number | string; name: string; email: string };
