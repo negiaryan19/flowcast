@@ -1,6 +1,6 @@
 # FlowCast research and build roadmap
 
-Updated 23 November 2026 for a one-month Intermo internship delivery. Working deadline: 23 December 2026, one calendar month from today. Target a complete core demo by 20 December and reserve 21–23 December for mentor feedback and submission. This replaces the earlier February delivery plan; the screenshot's February date is no longer the planning target.
+Updated 24 November 2026 for a one-month Intermo internship delivery. Working deadline: 23 December 2026, one calendar month from the 23 November start. Target a complete core demo by 20 December and reserve 21–23 December for mentor feedback and submission. This replaces the earlier February delivery plan; the screenshot's February date is no longer the planning target.
 
 Planning assumption: one developer working roughly 25–30 focused hours per week. The committed scope proposed for mentor review is an evaluated traffic-volume forecast, FastAPI service, and interactive 3D dashboard using historical data. Congestion and travel time are conditional extensions; calibrated accident-risk prediction is outside the proposed one-month commitment unless suitable matched data and additional capacity are secured. These scope changes require mentor agreement because the original brief includes all four capabilities.
 
@@ -16,11 +16,11 @@ The project started with two commits on `main`. Development is now active on `co
 | Data pipeline | UCI download, source metadata, hourly cleaning and chronological features | Implemented and tested |
 | Forecasting | Persistence, weekly seasonal baseline and gradient boosting comparison | Implemented; gradient boosting selected |
 | Backend | FastAPI health, metadata, latest forecast and replay endpoints | Implemented and tested |
-| Dashboard | React dashboard, measured metrics, chart and MapLibre 3D scene | Implemented and browser reviewed |
-| Verification | Eight Python tests, lint, TypeScript check, production build and dependency audit | Passing locally |
+| Dashboard | Seven-view workspace, local login, 3D/2D map, replay, chart and exports | Implemented and browser reviewed |
+| Verification | 30 Python tests, lint, TypeScript check, production build and dependency audit | Passing locally |
 | CI and deployment | GitHub Actions workflow prepared; hosted environment not selected | CI prepared, deployment pending |
 
-The core historical demonstration is now runnable. On the untouched test period, gradient boosting achieved MAE 136.83 and RMSE 207.28 vehicles/hour; the weekly baseline MAE was 297.72. The dashboard presents the result as a historical one-corridor demonstration. Congestion, travel time, accident risk, live data and deployment remain outside the completed scope.
+The core historical demonstration is now runnable. On the held-out test period, gradient boosting achieved MAE 136.95 and RMSE 206.83 vehicles/hour; the weekly baseline MAE was 297.79. The dashboard presents the result as a historical one-corridor demonstration. Congestion, travel time, accident risk, live data and deployment remain outside the completed scope.
 
 ## Research findings and product scope
 
@@ -63,7 +63,7 @@ Build a traffic operations dashboard with a map as the main workspace. Proposed 
 
 [MapLibre's 3D example](https://maplibre.org/maplibre-gl-js/docs/examples/display-buildings-in-3d/) demonstrates building extrusion. [deck.gl TripsLayer](https://deck.gl/docs/api-reference/geo-layers/trips-layer) supports timestamped path animation. These make a suitable foundation; use Three.js only if a specific custom 3D feature requires it.
 
-Proposed visual design: dark navy canvas, quiet gray buildings, cyan selection, and clear green/amber/red traffic states accompanied by text labels. Keep readable charts and controls above the scene.
+Implemented visual design: ivory workspace, charcoal navigation, lime selection, an illustrated isometric login scene and a dark geographical map. Road colors are basemap styling, not measured congestion. Local accounts, public demo mode, seven workspace views, replay, chart selection, CSV/JSON exports and printable summary are implemented. Forecast intervals, multiple datasets and live feeds remain planned.
 
 | Area | Behavior |
 | --- | --- |
@@ -98,7 +98,7 @@ docs/                dataset cards, model cards, architecture, demo guide
 .github/workflows/   Python checks and frontend build
 ```
 
-Use the empty existing `api/` as the backend starting point. The empty `dashboard/app.py` does not establish an existing frontend stack; decide whether to remove it when implementing React.
+The API and React frontend are now implemented in `api/` and `frontend/`. Accounts use local SQLite; public historical forecasting remains accessible in demo mode.
 
 1. Define one record per sensor and timestamp. Audit duplicate timestamps, repeated weather rows, missing periods, impossible units, and suspicious zeros before splitting.
 2. Resolve source timezone and daylight-saving ambiguity explicitly; preserve original timestamps. Display local times while keeping a consistent internal representation.
@@ -106,7 +106,7 @@ Use the empty existing `api/` as the backend starting point. The empty `dashboar
 4. Start with persistence and same-hour-last-week baselines. Train gradient boosting next; compare random forest if useful. Try an LSTM or graph model only after the simpler approach is measured and there is time.
 5. Build lagged volume/speed, shifted rolling statistics, hour, weekday, holiday, and available weather features. At each horizon, use only information available at issue time. Never use actual intervening future traffic for a multi-step forecast.
 6. Report MAE and RMSE by horizon, peak/off-peak, and weather conditions. Avoid using MAPE alone because zero or small volumes distort it.
-7. Proposed model gate: at least 10% lower validation MAE than the stronger baseline, with acceptable peak-hour performance. This is a target, not an achieved result; publish the test result even if it misses the target and serve the baseline if it is stronger.
+7. Proposed model gate: at least 10% lower validation MAE than the stronger baseline, with acceptable peak-hour performance. Version 0.2.0 exceeds this target on the current validation split; retain the baseline comparison and publish results for each future dataset or horizon.
 8. Calibrate forecast intervals on held-out validation data and report observed coverage and width on the test period. Never invent a confidence percentage for the interface.
 
 For congestion, document a speed/free-flow rule and validate speed error plus category performance. For travel time, sum segment length divided by speed with consistent units and safeguards for near-zero speeds; validate against observed trips when available. For risk, specify the prediction unit and exposure first, then use temporal/spatial holdouts, PR-AUC, calibration, and recall at an acceptable false-alert rate. A severity classifier trained only on crashes predicts severity conditional on a crash, not crash likelihood.
@@ -130,6 +130,15 @@ Data decision gate on 26 November: confirm whether the mentor accepts volume for
 Extension gate on 13 December: attempt congestion or travel-time estimation only if the core model, API, and 3D interaction already work, and suitable data is available. Limit extension work to four hours initially. Otherwise devote all remaining time to reliability and the report. Accident-risk prediction remains a documented research extension, not an invented output.
 
 Build a one-hour volume forecast first. Add three- and six-hour horizons only after the first horizon works and passes evaluation. Keep one dataset and geography in the core demo. Custom 3D models, animated vehicles, neural networks, additional cities, payments, and live-feed integration are optional post-submission work. Preserve core 3D navigation, reproducible inference, honest evaluation, and the submission buffer.
+
+## Next implementation priorities
+
+1. Review the corrected version 0.2.0 model and data policies with the mentor.
+2. Add peak/off-peak and weather-group error analysis; assess forecast intervals before displaying them.
+3. Verify clean setup and desktop/mobile interaction on the submission device.
+4. Choose hosting, configure same-origin HTTPS, secure cookies, persistent storage and production account recovery.
+5. Secure suitable speed/journey data before attempting congestion or travel-time outputs.
+6. Record the demonstration and finalize the submission report by 20 December.
 
 ## Daily delivery rhythm
 
