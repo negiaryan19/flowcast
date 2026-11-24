@@ -33,6 +33,9 @@ def baseline_artifact() -> dict:
         "latest_issue_time": "2024-01-31T10:00:00",
         "latest_target_time": "2024-01-31T11:00:00",
         "evaluation": {"validation": {}, "test": {}},
+        "error_analysis": {
+            "peak_weekday": {"observations": 10, "mae": 42.0, "rmse": 55.0}
+        },
         "history": [
             {"timestamp": "2024-01-31T11:00:00", "actual": 1200.0, "predicted": 1234.0}
         ],
@@ -72,3 +75,14 @@ def test_history_rejects_unsupported_limit(monkeypatch, tmp_path: Path) -> None:
     use_artifact(monkeypatch, artifact_path)
     response = TestClient(main.app).get("/api/v1/history?limit=100")
     assert response.status_code == 422
+
+
+def test_model_metadata_exposes_error_analysis(monkeypatch, tmp_path: Path) -> None:
+    artifact_path = tmp_path / "model.joblib"
+    joblib.dump(baseline_artifact(), artifact_path)
+    use_artifact(monkeypatch, artifact_path)
+
+    response = TestClient(main.app).get("/api/v1/model")
+
+    assert response.status_code == 200
+    assert response.json()["error_analysis"]["peak_weekday"]["mae"] == 42.0
