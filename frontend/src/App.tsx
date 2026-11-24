@@ -855,6 +855,41 @@ function Workspace({
                       </table>
                     </div>
                   </section>
+                  <section className="panel">
+                    <PanelTitle
+                      title="Where the model works harder"
+                      subtitle="Held-out test error grouped by time and observed weather."
+                    />
+                    <div className="table-scroll">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Segment</th>
+                            <th>Observations</th>
+                            <th>MAE · veh/h</th>
+                            <th>RMSE · veh/h</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Object.entries(data.model.error_analysis ?? {}).map(
+                            ([name, value]) => (
+                              <tr key={name}>
+                                <td>{modelName(name)}</td>
+                                <td>{number(value.observations)}</td>
+                                <td>{number(value.mae, 2)}</td>
+                                <td>{number(value.rmse, 2)}</td>
+                              </tr>
+                            ),
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="summary-note">
+                      Peak weekday means 07:00–09:59 and 15:00–18:59 on
+                      Monday–Friday. Weather groups use observations available
+                      at forecast issue time.
+                    </p>
+                  </section>
                   <div className="two-columns">
                     <section className="panel">
                       <PanelTitle
