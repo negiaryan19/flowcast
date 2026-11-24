@@ -13,6 +13,7 @@ The active one-month build runs from 23 November to 23 December 2026. The commit
 - a redesigned React workspace with overview, network explorer, forecast history, model lab, reports, data sources and settings;
 - an isometric login page with working local account creation, sign-in and sign-out;
 - a MapLibre 3D/2D map, historical replay, chart selection, CSV/JSON export and print-friendly report;
+- a bounded weather scenario simulator for transparent counterfactual model checks;
 - 30 backend tests covering data leakage, forecasting contracts and session authentication.
 
 Congestion, travel-time, accident-risk, and live-city claims require additional matching datasets. See [the mentor report](MENTOR_REVIEW_REPORT.md) and [roadmap](ROADMAP.md) for scope and review points.
@@ -63,6 +64,12 @@ The demo represents that historical corridor and period. It does not represent l
 ## Measured result
 
 The current gradient boosting model was selected on a chronological validation period. On the held-out April–September 2018 test period it achieved MAE **136.95 vehicles/hour** and RMSE **206.83 vehicles/hour**. The weekly seasonal baseline recorded MAE **297.79 vehicles/hour**. Generated artifacts and evaluation JSON remain local and can be reproduced with `python -m ml.train`.
+
+## Weather scenario simulator
+
+The **Model lab** includes a counterfactual weather scenario tool. It can change temperature, rainfall, snowfall, or cloud cover in the latest model input and compare the resulting one-hour traffic-volume prediction with the baseline.
+
+It is deliberately not a live weather or traffic prediction: the source is historical, and the simulator holds calendar and traffic-history features fixed. Treat the output as a controlled model sensitivity check. The API endpoint is `POST /api/v1/scenarios/weather`; submit one or more bounded weather values, for example `{"rain_1h": 10, "clouds_all": 90}`.
 
 ## Project documents
 
