@@ -16,8 +16,8 @@ Record the mentor's response in the roadmap before changing the prediction scope
 
 1. Confirm that `negiaryan68487@gmail.com` is connected to the GitHub account if contribution attribution matters.
 2. Review the commits on `codex/one-month-build`.
-3. Push the branch and open a pull request when ready for remote review.
-4. Check that both GitHub Actions jobs pass before merging.
+3. Review [draft PR #6](https://github.com/negiaryan19/flowcast/pull/6); the branch has been pushed.
+4. Backend and frontend checks passed for `cd3f0b0`. Check the latest PR checks before marking it ready and merging. Merge into the default branch is a separate review decision; feature-branch commits alone do not guarantee profile contribution credit.
 
 ## Deployment
 
