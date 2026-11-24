@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import timedelta
+from numbers import Integral
 from pathlib import Path
 
 import numpy as np
@@ -47,7 +48,8 @@ class SplitData:
 
 
 def load_raw(path: Path | str) -> pd.DataFrame:
-    frame = pd.read_csv(path)
+    # "None" is the dataset's real non-holiday label, not a missing value.
+    frame = pd.read_csv(path, keep_default_na=False)
     missing = REQUIRED_COLUMNS - set(frame.columns)
     if missing:
         raise ValueError(f"Dataset is missing required columns: {sorted(missing)}")
@@ -62,6 +64,17 @@ def clean_hourly(raw: pd.DataFrame) -> pd.DataFrame:
     for column in numeric:
         frame[column] = pd.to_numeric(frame[column], errors="coerce")
     frame = frame.dropna(subset=["date_time", "traffic_volume"])
+
+    # Reject invalid weather before aggregating duplicate timestamp records.
+    weather_ranges = {
+        "temp": (180, 330),
+        "rain_1h": (0, 300),
+        "snow_1h": (0, 100),
+        "clouds_all": (0, 100),
+    }
+    for column, (lower, upper) in weather_ranges.items():
+        frame.loc[~frame[column].between(lower, upper), column] = np.nan
+    frame["holiday"] = frame["holiday"].fillna("None").replace("", "None")
 
     hourly = (
         frame.groupby("date_time", sort=True)
@@ -83,21 +96,23 @@ def clean_hourly(raw: pd.DataFrame) -> pd.DataFrame:
     hourly["observed"] = hourly["traffic_volume"].notna()
 
     weather = ["temp", "rain_1h", "snow_1h", "clouds_all"]
-    hourly[weather] = hourly[weather].interpolate(limit=3, limit_direction="both")
+    # Carry only already-observed weather through short gaps. Leading gaps and
+    # gaps longer than three hours remain missing and are excluded by features.
+    # Interpolation and backfill would leak observations from after issue time.
+    hourly[weather] = hourly[weather].ffill(limit=3)
     hourly["holiday"] = hourly["holiday"].fillna("None")
     hourly["source_rows"] = hourly["source_rows"].fillna(0).astype(int)
 
-    # Extreme values in the source are treated as missing weather observations.
-    hourly.loc[~hourly["temp"].between(180, 330), "temp"] = np.nan
-    hourly.loc[~hourly["rain_1h"].between(0, 300), "rain_1h"] = np.nan
-    hourly.loc[~hourly["snow_1h"].between(0, 100), "snow_1h"] = np.nan
-    hourly[weather] = hourly[weather].ffill().bfill()
     return hourly
 
 
 def build_features(hourly: pd.DataFrame, horizon: int = 1) -> pd.DataFrame:
+    if isinstance(horizon, bool) or not isinstance(horizon, Integral):
+        raise ValueError("Forecast horizon must be an integer number of hours")
     if horizon < 1:
         raise ValueError("Forecast horizon must be at least one hour")
+    if horizon > 168:
+        raise ValueError("Forecast horizon must be at most 168 hours for the weekly baseline")
 
     data = hourly.copy()
     index = data.index

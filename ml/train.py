@@ -63,7 +63,7 @@ def train() -> dict:
 
     artifact = {
         "schema_version": 1,
-        "model_version": "0.1.0",
+        "model_version": "0.2.0",
         "trained_at": datetime.now(UTC).isoformat(),
         "champion": champion,
         "model": model,
@@ -139,6 +139,9 @@ def train() -> dict:
         "champion": champion,
         "test": test_results,
     }
+
+    artifact["evaluation_periods"] = report["periods"]
+    artifact["row_counts"] = report["rows"]
 
     ARTIFACT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
