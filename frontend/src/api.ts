@@ -1,21 +1,50 @@
-import type { Forecast, HistoryPoint, ModelMetadata } from "./types";
-
+import type { Forecast, HistoryPoint, ModelMetadata, User } from "./types";
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
-
-async function getJson<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`);
+export async function request<T>(
+  path: string,
+  init: RequestInit = {},
+): Promise<T> {
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      credentials: "include",
+      ...init,
+    });
+  } catch {
+    throw new Error(
+      "Cannot reach FlowCast. Check that the local API is running, then try again.",
+    );
+  }
   if (!response.ok) {
     const body = await response.json().catch(() => null);
-    throw new Error(body?.detail ?? `Request failed with status ${response.status}`);
+    const d = body?.detail;
+    throw new Error(
+      typeof d === "string"
+        ? d
+        : Array.isArray(d)
+          ? d.map((i: { msg: string }) => i.msg).join(". ")
+          : "The request could not be completed. Please try again.",
+    );
   }
   return response.json() as Promise<T>;
 }
-
 export async function loadDashboard() {
   const [forecast, history, model] = await Promise.all([
-    getJson<Forecast>("/api/v1/forecast/latest"),
-    getJson<HistoryPoint[]>("/api/v1/history?limit=48"),
-    getJson<ModelMetadata>("/api/v1/model")
+    request<Forecast>("/api/v1/forecast/latest"),
+    request<HistoryPoint[]>("/api/v1/history?limit=72"),
+    request<ModelMetadata>("/api/v1/model"),
   ]);
   return { forecast, history, model };
 }
+export const getSession = () =>
+  request<{ user: User | null }>("/api/v1/auth/me");
+export const signOut = () => request("/api/v1/auth/logout", { method: "POST" });
+export const authenticate = (
+  mode: "login" | "register",
+  values: { name?: string; email: string; password: string },
+) =>
+  request<{ user: User }>(`/api/v1/auth/${mode}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(values),
+  });

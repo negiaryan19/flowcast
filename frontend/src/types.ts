@@ -43,4 +43,8 @@ export type ModelMetadata = {
     test: Record<string, Metric>;
   };
   feature_count: number;
+  evaluation_periods?: Record<string, string[]>;
+  row_counts?: Record<string, number>;
 };
+
+export type User = { id: number | string; name: string; email: string };
