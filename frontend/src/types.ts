@@ -47,6 +47,7 @@ export type ModelMetadata = {
   evaluation_periods?: Record<string, string[]>;
   row_counts?: Record<string, number>;
   error_analysis?: Record<string, SegmentMetric>;
+  data_quality?: Record<string, number>;
 };
 
 export type User = { id: number | string; name: string; email: string };

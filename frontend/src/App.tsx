@@ -1108,6 +1108,41 @@ function Workspace({
                       </p>
                     </section>
                   </div>
+                  <section className="panel">
+                    <PanelTitle
+                      title="Data preparation audit"
+                      subtitle="Counts produced during the reproducible training run."
+                    />
+                    <dl className="data-list">
+                      {[
+                        ["Source records", "source_rows"],
+                        [
+                          "Unique source timestamps",
+                          "unique_source_timestamps",
+                        ],
+                        [
+                          "Duplicate weather rows collapsed",
+                          "duplicate_weather_rows_collapsed",
+                        ],
+                        ["Regular hourly slots", "regular_hourly_slots"],
+                        [
+                          "Missing traffic hours retained",
+                          "missing_traffic_hours",
+                        ],
+                        ["Forecast-ready rows", "prepared_forecast_rows"],
+                      ].map(([label, key]) => (
+                        <div key={key}>
+                          <dt>{label}</dt>
+                          <dd>{number(data.model.data_quality?.[key] ?? 0)}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                    <p className="summary-note">
+                      Missing traffic is never copied from future records.
+                      Duplicate source rows can occur when weather descriptions
+                      differ for one observed traffic timestamp.
+                    </p>
+                  </section>
                   <section className="panel scope-card">
                     <PanelTitle
                       title="Next connections"
