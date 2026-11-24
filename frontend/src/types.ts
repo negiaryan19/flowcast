@@ -26,6 +26,27 @@ export type HistoryPoint = {
   predicted: number;
 };
 
+export type WeatherScenarioInput = Partial<
+  Pick<WeatherConditions, "temp" | "rain_1h" | "snow_1h" | "clouds_all">
+>;
+
+export type WeatherConditions = {
+  temp: number;
+  rain_1h: number;
+  snow_1h: number;
+  clouds_all: number;
+};
+
+export type WeatherScenario = {
+  baseline_prediction: number;
+  scenario_prediction: number;
+  difference: number;
+  overrides: WeatherScenarioInput;
+  units: string;
+  model_version: string;
+  disclaimer: string;
+};
+
 type Metric = { mae: number; rmse: number };
 type SegmentMetric = Metric & { observations: number };
 

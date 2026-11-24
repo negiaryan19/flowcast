@@ -1,4 +1,11 @@
-import type { Forecast, HistoryPoint, ModelMetadata, User } from "./types";
+import type {
+  Forecast,
+  HistoryPoint,
+  ModelMetadata,
+  User,
+  WeatherScenario,
+  WeatherScenarioInput,
+} from "./types";
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 export async function request<T>(
   path: string,
@@ -47,4 +54,10 @@ export const authenticate = (
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(values),
+  });
+export const runWeatherScenario = (overrides: WeatherScenarioInput) =>
+  request<WeatherScenario>("/api/v1/scenarios/weather", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(overrides),
   });
