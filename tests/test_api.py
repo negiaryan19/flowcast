@@ -53,6 +53,14 @@ def test_health_reports_missing_artifact(monkeypatch, tmp_path: Path) -> None:
     assert response.json()["model_ready"] is False
 
 
+def test_api_responses_include_security_headers() -> None:
+    response = TestClient(main.app).get("/health")
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert response.headers["X-Frame-Options"] == "DENY"
+    assert response.headers["Referrer-Policy"] == "no-referrer"
+    assert "geolocation=()" in response.headers["Permissions-Policy"]
+
+
 def test_latest_forecast_and_history(monkeypatch, tmp_path: Path) -> None:
     artifact_path = tmp_path / "model.joblib"
     joblib.dump(baseline_artifact(), artifact_path)
