@@ -1625,6 +1625,105 @@ tbody tr:hover {
   font-size: 0.8125rem;
   color: #98ad87;
 }
+.scenario-panel {
+  margin-top: 20px;
+}
+.scenario-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 20px;
+  padding: 22px 21px 13px;
+}
+.scenario-heading .caps {
+  color: #688149;
+  font-size: 0.6875rem;
+}
+.scenario-heading h2 {
+  margin-top: 8px;
+  font-size: 1.05rem;
+}
+.scenario-heading p {
+  margin-top: 6px;
+  color: #899876;
+  font-size: 0.8125rem;
+}
+.scenario-form {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  padding: 6px 21px 21px;
+}
+.scenario-inputs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(100px, 1fr));
+  gap: 10px;
+  flex: 1;
+}
+.scenario-inputs label > span {
+  display: block;
+  margin-bottom: 6px;
+  color: #637258;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.scenario-inputs label > div {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dce4d3;
+  border-radius: 7px;
+  background: #fbfcf9;
+}
+.scenario-inputs input {
+  width: 100%;
+  border: 0;
+  padding: 9px 4px 9px 9px;
+  outline: 0;
+  background: transparent;
+  color: #2b3729;
+}
+.scenario-inputs small {
+  padding: 0 8px 0 3px;
+  color: #91a083;
+  font: 0.6875rem var(--mono);
+}
+.scenario-result {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  border-top: 1px solid #e4e9dc;
+  background: #e4e9dc;
+}
+.scenario-result > div {
+  padding: 16px 21px;
+  background: #fbfcf9;
+}
+.scenario-result span {
+  display: block;
+  color: #899876;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.scenario-result strong {
+  display: block;
+  margin-top: 5px;
+  color: #2c3b29;
+  font: 500 1.25rem var(--mono);
+}
+.scenario-result .increase strong { color: #a55d2a; }
+.scenario-result .decrease strong { color: #58762f; }
+.scenario-result p,
+.scenario-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 12px 21px;
+  background: #f5f8ee;
+  color: #7a886d;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.scenario-error { color: #a24735; background: #fff4f1; }
 .data-list {
   padding: 0 21px;
   margin: 0;
