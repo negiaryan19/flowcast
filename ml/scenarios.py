@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Mapping
+from collections.abc import Mapping
 
 WEATHER_BOUNDS: dict[str, tuple[float, float]] = {
     "temp": (180.0, 330.0),

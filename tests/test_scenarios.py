@@ -22,6 +22,8 @@ def test_weather_scenario_changes_only_weather_values() -> None:
         ({"temp": True}, "temp must be a number"),
     ],
 )
-def test_weather_scenario_rejects_invalid_inputs(overrides: dict[str, object], message: str) -> None:
+def test_weather_scenario_rejects_invalid_inputs(
+    overrides: dict[str, object], message: str
+) -> None:
     with pytest.raises(ValueError, match=message):
         weather_scenario_features({"temp": 280.0, "rain_1h": 0.0}, overrides)

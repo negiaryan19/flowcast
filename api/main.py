@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 
 from api.auth import router as auth_router
 from ml.data import FEATURE_COLUMNS
+from ml.scenarios import weather_scenario_features
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL_PATH = ROOT / "artifacts" / "traffic_volume_1h.joblib"
@@ -50,6 +51,25 @@ class ForecastResponse(BaseModel):
     model_name: str
     data_mode: str
     source: str
+
+
+class WeatherScenarioRequest(BaseModel):
+    """Counterfactual conditions for the next-hour forecast input."""
+
+    temp: float | None = Field(default=None, ge=180, le=330)
+    rain_1h: float | None = Field(default=None, ge=0, le=300)
+    snow_1h: float | None = Field(default=None, ge=0, le=100)
+    clouds_all: float | None = Field(default=None, ge=0, le=100)
+
+
+class WeatherScenarioResponse(BaseModel):
+    baseline_prediction: float = Field(ge=0)
+    scenario_prediction: float = Field(ge=0)
+    difference: float
+    overrides: dict[str, float]
+    units: str
+    model_version: str
+    disclaimer: str
 
 
 class HistoryPoint(BaseModel):
@@ -204,6 +224,46 @@ def latest_forecast() -> ForecastResponse:
         model_name=champion,
         data_mode=artifact["data_mode"],
         source=artifact["source"],
+    )
+
+
+@app.post("/api/v1/scenarios/weather", response_model=WeatherScenarioResponse)
+def weather_scenario(request: WeatherScenarioRequest) -> WeatherScenarioResponse:
+    """Score a bounded weather counterfactual using the loaded model artifact."""
+    artifact = store.require()
+    if artifact["champion"] != "gradient_boosting":
+        raise HTTPException(
+            status_code=409,
+            detail="Weather scenarios require a gradient_boosting model artifact.",
+        )
+
+    overrides = request.model_dump(exclude_none=True)
+    if not overrides:
+        raise HTTPException(status_code=422, detail="Provide at least one weather override.")
+    try:
+        scenario_features = weather_scenario_features(artifact["latest_features"], overrides)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    baseline_input = pd.DataFrame([artifact["latest_features"]], columns=FEATURE_COLUMNS)
+    scenario_input = pd.DataFrame([scenario_features], columns=FEATURE_COLUMNS)
+    baseline = float(artifact["model"].predict(baseline_input)[0])
+    scenario = float(
+        artifact["model"].predict(scenario_input)[0]
+    )
+    baseline = max(0.0, round(baseline, 1))
+    scenario = max(0.0, round(scenario, 1))
+    return WeatherScenarioResponse(
+        baseline_prediction=baseline,
+        scenario_prediction=scenario,
+        difference=round(scenario - baseline, 1),
+        overrides=overrides,
+        units=artifact["units"],
+        model_version=artifact["model_version"],
+        disclaimer=(
+            "Counterfactual model output only. It changes weather inputs while holding "
+            "calendar and traffic-history features fixed; it is not a weather forecast."
+        ),
     )
 
 
