@@ -24,9 +24,11 @@ Development began on 23 November from a repository containing two initial commit
 | Machine learning | Persistence, weekly baseline and gradient boosting evaluated | Mentor review of results and error analysis |
 | Backend | FastAPI metadata, forecast/replay and local account/session endpoints implemented | Add deployment configuration after hosting decision |
 | Frontend | Seven-view React workspace, login, MapLibre 3D/2D map, replay and exports implemented | Collect mentor feedback and test on target device |
-| Testing and delivery | 30 backend tests, Python lint, TypeScript check, production build and npm audit pass locally | Run GitHub Actions and deploy or record local demo |
+| Testing and delivery | 30 backend tests, Python lint, TypeScript check, production build and npm audit pass locally | Record final demonstration and choose hosting |
 
 The chronological held-out test period contains 4,128 prepared observations from April to September 2018. Gradient boosting achieved MAE 136.95 vehicles/hour and RMSE 206.83. The weekly seasonal baseline achieved MAE 297.79 and RMSE 618.26, so the model reduced test MAE by about 54%. These results measure historical forecast error for one corridor. Response time, local traffic generalization, operational impact, and revenue have not been measured.
+
+The implementation branch is pushed to GitHub in [draft PR #6](https://github.com/negiaryan19/flowcast/pull/6). Both frontend and backend jobs passed in [GitHub Actions](https://github.com/negiaryan19/flowcast/actions/runs/45321336232) for implementation commit `cd3f0b0`. The pull request remains open for review; deployment is pending.
 
 ## Verification recorded on 24 November
 
@@ -37,7 +39,7 @@ The chronological held-out test period contains 4,128 prepared observations from
 - Tested local account creation, incorrect-password handling, sign-in, session persistence across reload and sign-out using a synthetic test account.
 - Screenshots: [login](docs/screenshots/login.jpg), [dashboard](docs/screenshots/dashboard.jpg), [mobile login](docs/screenshots/login-mobile.jpg), [mobile dashboard](docs/screenshots/dashboard-mobile.jpg).
 
-Known verification limits: the map dependency produces a large-chunk build advisory; the external basemap reports a missing decorative wood-pattern sprite although the map renders. Formal FPS/load-time benchmarking, offline/WebGL-disabled testing, production deployment and remote CI verification are still pending. A Starlette/AnyIO deprecation warning appears in the test run.
+Known verification limits: the map dependency produces a large-chunk build advisory; the external basemap reports a missing decorative wood-pattern sprite although the map renders. Formal FPS/load-time benchmarking, offline/WebGL-disabled testing, production deployment are still pending. A Starlette/AnyIO deprecation warning appears in the test run.
 
 ## Objectives and proposed scope
 

@@ -8,7 +8,7 @@ See [the mentor review report](MENTOR_REVIEW_REPORT.md) for a shareable project 
 
 ## Current project status
 
-The project started with two commits on `main`. Development is now active on `codex/one-month-build`. The configured remote is `https://github.com/negiaryan19/flowcast.git`. This status reflects the local checkout; GitHub Actions and deployment have not yet been observed remotely.
+The project started with two commits on `main`. Development is now active on `codex/one-month-build`. The configured remote is `https://github.com/negiaryan19/flowcast.git`. The branch is pushed in [draft PR #6](https://github.com/negiaryan19/flowcast/pull/6). [Backend and frontend CI passed](https://github.com/negiaryan19/flowcast/actions/runs/45321336232) for commit `cd3f0b0`; deployment remains pending.
 
 | Component | Evidence | Status |
 | --- | --- | --- |
@@ -18,7 +18,7 @@ The project started with two commits on `main`. Development is now active on `co
 | Backend | FastAPI health, metadata, latest forecast and replay endpoints | Implemented and tested |
 | Dashboard | Seven-view workspace, local login, 3D/2D map, replay, chart and exports | Implemented and browser reviewed |
 | Verification | 30 Python tests, lint, TypeScript check, production build and dependency audit | Passing locally |
-| CI and deployment | GitHub Actions workflow prepared; hosted environment not selected | CI prepared, deployment pending |
+| CI and deployment | GitHub Actions workflow prepared; hosted environment not selected | CI passing, deployment pending |
 
 The core historical demonstration is now runnable. On the held-out test period, gradient boosting achieved MAE 136.95 and RMSE 206.83 vehicles/hour; the weekly baseline MAE was 297.79. The dashboard presents the result as a historical one-corridor demonstration. Congestion, travel time, accident risk, live data and deployment remain outside the completed scope.
 
