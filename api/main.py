@@ -13,6 +13,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from api.auth import router as auth_router
 from ml.data import FEATURE_COLUMNS
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -106,16 +107,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.include_router(auth_router)
+
 origins = [
     origin.strip()
-    for origin in os.getenv("FLOWCAST_ALLOW_ORIGINS", "http://localhost:5173").split(",")
+    for origin in os.getenv("FLOWCAST_ALLOW_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
     if origin.strip()
 ]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=False,
-    allow_methods=["GET"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
@@ -145,6 +148,8 @@ def model_metadata() -> dict[str, Any]:
         "location": artifact["location"],
         "evaluation": artifact["evaluation"],
         "feature_count": len(artifact["feature_columns"]),
+        "evaluation_periods": artifact.get("evaluation_periods", {}),
+        "row_counts": artifact.get("row_counts", {}),
     }
 
 
