@@ -3,7 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import joblib
+import pandas as pd
 from fastapi.testclient import TestClient
+from sklearn.dummy import DummyRegressor
 
 from api import main
 
@@ -98,3 +100,39 @@ def test_model_metadata_exposes_error_analysis(monkeypatch, tmp_path: Path) -> N
 
     assert response.status_code == 200
     assert response.json()["error_analysis"]["peak_weekday"]["mae"] == 42.0
+
+
+def test_weather_scenario_scores_valid_weather_override(monkeypatch, tmp_path: Path) -> None:
+    artifact_path = tmp_path / "model.joblib"
+    artifact = baseline_artifact()
+    artifact["champion"] = "gradient_boosting"
+    model = DummyRegressor(strategy="constant", constant=1010.0)
+    model.fit(pd.DataFrame({"volume_now": [1.0]}), [1010.0])
+    artifact["model"] = model
+    joblib.dump(artifact, artifact_path)
+    use_artifact(monkeypatch, artifact_path)
+
+    response = TestClient(main.app).post(
+        "/api/v1/scenarios/weather", json={"rain_1h": 10, "clouds_all": 80}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["scenario_prediction"] == 1010.0
+    assert response.json()["difference"] == 0.0
+    assert response.json()["overrides"] == {"rain_1h": 10.0, "clouds_all": 80.0}
+
+
+def test_weather_scenario_requires_an_override(monkeypatch, tmp_path: Path) -> None:
+    artifact_path = tmp_path / "model.joblib"
+    artifact = baseline_artifact()
+    artifact["champion"] = "gradient_boosting"
+    model = DummyRegressor(strategy="constant", constant=1010.0)
+    model.fit(pd.DataFrame({"volume_now": [1.0]}), [1010.0])
+    artifact["model"] = model
+    joblib.dump(artifact, artifact_path)
+    use_artifact(monkeypatch, artifact_path)
+
+    response = TestClient(main.app).post("/api/v1/scenarios/weather", json={})
+
+    assert response.status_code == 422
+    assert "at least one" in response.json()["detail"]
