@@ -102,7 +102,7 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(
     title="FlowCast API",
-    version="0.1.0",
+    version="0.3.0",
     description="Historical one-hour traffic-volume forecast demonstration.",
     lifespan=lifespan,
 )
@@ -150,6 +150,7 @@ def model_metadata() -> dict[str, Any]:
         "feature_count": len(artifact["feature_columns"]),
         "evaluation_periods": artifact.get("evaluation_periods", {}),
         "row_counts": artifact.get("row_counts", {}),
+        "error_analysis": artifact.get("error_analysis", {}),
     }
 
 
