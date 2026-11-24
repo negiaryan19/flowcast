@@ -67,9 +67,13 @@ def test_latest_forecast_and_history(monkeypatch, tmp_path: Path) -> None:
     use_artifact(monkeypatch, artifact_path)
     client = TestClient(main.app)
 
+    health = client.get("/health")
     forecast = client.get("/api/v1/forecast/latest")
     history = client.get("/api/v1/history?limit=1")
 
+    assert health.json()["service_version"] == "0.3.0"
+    assert health.json()["model_version"] == "test"
+    assert health.json()["model_loaded_at"] is not None
     assert forecast.status_code == 200
     assert forecast.json()["predicted_volume"] == 1234.0
     assert forecast.json()["data_mode"] == "historical"

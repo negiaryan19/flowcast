@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +24,9 @@ DEFAULT_MODEL_PATH = ROOT / "artifacts" / "traffic_volume_1h.joblib"
 class HealthResponse(BaseModel):
     status: str
     model_ready: bool
+    service_version: str = "0.3.0"
+    model_version: str | None = None
+    model_loaded_at: str | None = None
     detail: str | None = None
 
 
@@ -60,6 +64,7 @@ class ModelStore:
         self.path = path or (Path(configured) if configured else DEFAULT_MODEL_PATH)
         self.artifact: dict[str, Any] | None = None
         self.error: str | None = None
+        self.loaded_at: str | None = None
 
     def load(self) -> None:
         try:
@@ -76,9 +81,11 @@ class ModelStore:
                 raise ValueError(f"Model artifact is missing fields: {sorted(missing)}")
             self.artifact = loaded
             self.error = None
+            self.loaded_at = datetime.now(UTC).isoformat()
         except (FileNotFoundError, OSError, ValueError, KeyError) as exc:
             self.artifact = None
             self.error = str(exc)
+            self.loaded_at = None
 
     def require(self) -> dict[str, Any]:
         if self.artifact is None:
@@ -137,10 +144,20 @@ async def security_headers(request: Request, call_next) -> Response:
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     if store.artifact is not None:
-        return HealthResponse(status="ok", model_ready=True)
+        return HealthResponse(
+            status="ok",
+            model_ready=True,
+            model_version=store.artifact.get("model_version"),
+            model_loaded_at=store.loaded_at,
+        )
     store.load()
     if store.artifact is not None:
-        return HealthResponse(status="ok", model_ready=True)
+        return HealthResponse(
+            status="ok",
+            model_ready=True,
+            model_version=store.artifact.get("model_version"),
+            model_loaded_at=store.loaded_at,
+        )
     return HealthResponse(status="degraded", model_ready=False, detail=store.error)
 
 
