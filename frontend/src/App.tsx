@@ -344,6 +344,9 @@ function Workspace({
     current?.timestamp ?? data?.forecast.target_time ?? "";
   return (
     <div className="workspace">
+      <a className="skip-link" href="#main-content">
+        Skip to workspace content
+      </a>
       {mobileMenu && (
         <button
           className="sidebar-scrim"

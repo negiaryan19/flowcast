@@ -578,6 +578,23 @@ button svg {
 .workspace {
   min-height: 100dvh;
 }
+
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  left: 1rem;
+  top: -4rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+  background: var(--ink, #18231d);
+  color: white;
+  font-weight: 700;
+  transition: top 160ms ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
 .sidebar {
   position: fixed;
   inset: 0 auto 0 0;
