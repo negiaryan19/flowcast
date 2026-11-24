@@ -19,9 +19,9 @@ The first model uses current and lagged traffic volume, temperature, hourly rain
 
 ## Processing decisions
 
-The source can contain multiple weather descriptions for a timestamp. FlowCast collapses these to one hourly record, preserving the median traffic volume and aggregated numeric weather values. It creates a regular hourly index, records whether traffic was observed, and interpolates short weather gaps. Implausible temperature and precipitation values are treated as missing weather observations.
+The source can contain multiple weather descriptions for a timestamp. FlowCast collapses these to one hourly record, preserving the median traffic volume and aggregated numeric weather values. It creates a regular hourly index, records whether traffic was observed, and forward-fills weather for at most three hours using past observations only. Leading missing weather and longer gaps stay missing; no backward fill or interpolation is used. Implausible temperature and precipitation values are marked missing before hourly aggregation so they cannot contaminate the aggregates. The literal holiday value `None` is retained, rather than parsed as a missing value.
 
-Model development uses chronological training, validation, and test periods. Feature creation uses only observations at or before the issue time. The test period is retained for final evaluation after model selection on validation data.
+Model development uses chronological training, validation, and test periods. Feature creation uses only observations at or before the issue time. The test period is retained for final evaluation after model selection on validation data. Version 0.2.0 uses 27,519 prepared observations: 19,263 training, 4,128 validation and 4,128 test. Source timestamps are preserved as local wall-clock values; timezone and daylight-saving ambiguities are not silently converted to UTC.
 
 ## Limitations
 

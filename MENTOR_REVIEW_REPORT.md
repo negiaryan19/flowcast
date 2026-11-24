@@ -2,7 +2,7 @@
 
 **Organization:** Intermo  
 **Project:** FlowCast — AI-Powered Smart Traffic Flow Prediction Platform  
-**Report date:** 23 November 2026  
+**Report date:** 24 November 2026  
 **Proposed project period:** 23 November–23 December 2026  
 **Report type:** Progress report and implementation proposal
 **Repository:** [negiaryan19/flowcast](https://github.com/negiaryan19/flowcast)
@@ -22,11 +22,22 @@ Development began on 23 November from a repository containing two initial commit
 | Scope and planning | One-month plan and mentor report prepared | Mentor feedback on scope |
 | Data | Reproducible UCI download, cleaning, features and dataset card implemented | Review duplicate and missing-period policy |
 | Machine learning | Persistence, weekly baseline and gradient boosting evaluated | Mentor review of results and error analysis |
-| Backend | FastAPI metadata, forecast and replay endpoints implemented | Add deployment configuration after hosting decision |
-| Frontend | Responsive React dashboard with MapLibre 3D scene implemented | Extend interaction after mentor review |
-| Testing and delivery | Eight backend tests, Python lint, TypeScript check, production build and npm audit pass locally | Run GitHub Actions and deploy or record local demo |
+| Backend | FastAPI metadata, forecast/replay and local account/session endpoints implemented | Add deployment configuration after hosting decision |
+| Frontend | Seven-view React workspace, login, MapLibre 3D/2D map, replay and exports implemented | Collect mentor feedback and test on target device |
+| Testing and delivery | 30 backend tests, Python lint, TypeScript check, production build and npm audit pass locally | Run GitHub Actions and deploy or record local demo |
 
-The untouched chronological test period contains 4,129 prepared observations from April to September 2018. Gradient boosting achieved MAE 136.83 vehicles/hour and RMSE 207.28. The weekly seasonal baseline achieved MAE 297.72 and RMSE 618.19, so the model reduced test MAE by about 54%. These results measure historical forecast error for one corridor. Response time, local traffic generalization, operational impact, and revenue have not been measured.
+The chronological held-out test period contains 4,128 prepared observations from April to September 2018. Gradient boosting achieved MAE 136.95 vehicles/hour and RMSE 206.83. The weekly seasonal baseline achieved MAE 297.79 and RMSE 618.26, so the model reduced test MAE by about 54%. These results measure historical forecast error for one corridor. Response time, local traffic generalization, operational impact, and revenue have not been measured.
+
+## Verification recorded on 24 November
+
+- All 30 Python tests and Ruff checks pass locally; TypeScript and the Vite production build pass.
+- Desktop and 390px mobile layouts reviewed in the in-app browser. The production build renders the 3D map and its bundled worker.
+- Tested public demo entry, replay play/pause, 2D switching, history range/filter, command search and keyboard chart selection.
+- Downloaded CSV verified: 48 observations with source-local timestamps, actual values, predictions and absolute errors.
+- Tested local account creation, incorrect-password handling, sign-in, session persistence across reload and sign-out using a synthetic test account.
+- Screenshots: [login](docs/screenshots/login.jpg), [dashboard](docs/screenshots/dashboard.jpg), [mobile login](docs/screenshots/login-mobile.jpg), [mobile dashboard](docs/screenshots/dashboard-mobile.jpg).
+
+Known verification limits: the map dependency produces a large-chunk build advisory; the external basemap reports a missing decorative wood-pattern sprite although the map renders. Formal FPS/load-time benchmarking, offline/WebGL-disabled testing, production deployment and remote CI verification are still pending. A Starlette/AnyIO deprecation warning appears in the test run.
 
 ## Objectives and proposed scope
 
@@ -46,13 +57,13 @@ Completing the proposed core would demonstrate an end-to-end forecasting applica
 
 ## Dataset and methodology
 
-The proposed starter source is [UCI Metro Interstate Traffic Volume](https://archive.ics.uci.edu/dataset/492/metro+interstate+traffic+volume), which contains historical hourly traffic with weather and holiday features for an I-94 corridor in Minnesota. It supports a volume experiment, not a claim of local Indian-road performance or citywide coverage. Attribution will be retained.
+The implemented starter source is [UCI Metro Interstate Traffic Volume](https://archive.ics.uci.edu/dataset/492/metro+interstate+traffic+volume), which contains historical hourly traffic with weather and holiday features for an I-94 corridor in Minnesota. It supports a volume experiment, not a claim of local Indian-road performance or citywide coverage. Attribution will be retained.
 
-The pipeline will audit data quality, resolve repeated timestamps, generate lagged traffic and calendar features, and divide data chronologically into training, validation, and final test periods. Preprocessing will be fitted on training data only. Forecasts will use information available at their issue time; future observed traffic and target-hour observed weather will not be used as if known in advance.
+The pipeline resolves repeated timestamps, rejects implausible weather, builds lagged traffic/calendar features and splits observations chronologically. Version 0.2.0 corrects earlier weather interpolation: short weather gaps now use past observations only, and the literal non-holiday label `None` is preserved. The model was retrained and all reported metrics were regenerated after these corrections. Features use information available at their issue time; future observed traffic and target-hour observed weather are excluded.
 
-Persistence and same-hour-last-week predictions will establish reference performance. A gradient boosting model will then be compared using mean absolute error (MAE) and root mean squared error (RMSE), including peak-hour error analysis. The final test period will remain untouched during model selection. If the learned model does not outperform the baseline, the result will be reported honestly and the stronger method will remain available.
+Persistence and same-hour-last-week predictions establish reference performance. Gradient boosting is compared using mean absolute error (MAE) and root mean squared error (RMSE). Detailed peak-hour error analysis is still pending. The final test period will remain untouched during model selection. If the learned model does not outperform the baseline, the result will be reported honestly and the stronger method will remain available.
 
-The proposed improvement target was at least 10% lower validation MAE than the stronger baseline. Gradient boosting recorded validation MAE 166.92, compared with 394.62 for the weekly seasonal baseline. Forecast intervals are still deferred until they can be calibrated and evaluated.
+The proposed improvement target was at least 10% lower validation MAE than the stronger baseline. Gradient boosting recorded validation MAE 167.19, compared with 394.44 for the weekly seasonal baseline. Forecast intervals are still deferred until they can be calibrated and evaluated.
 
 ## Technical design and 3D experience
 
@@ -62,14 +73,14 @@ The proposed improvement target was at least 10% lower validation MAE than the s
 | Backend | Implemented with FastAPI and a versioned local model artifact |
 | Frontend | Implemented with React, TypeScript and Vite |
 | 3D mapping | Implemented with MapLibre GL JS, OpenFreeMap tiles and building extrusion |
-| Storage | Local dataset and model files; additional database infrastructure remains conditional |
+| Storage | Local dataset/model files and SQLite accounts with hashed passwords and session tokens |
 | Verification | Python tests, lint, TypeScript checking, production build, dependency audit and browser review completed locally |
 
 Data will flow from ingestion and validation to feature generation, model training, evaluation, saved artifact, API, and dashboard. Training will remain separate from API requests.
 
 The user will select the represented location and historical time, view an observed-versus-predicted chart, and inspect the forecast's units, horizon and provenance. The map will show the geography supported by the dataset. A single corridor model will not be presented as forecasting every road in a city.
 
-The frontend will use a dark, readable visual theme with a tilted map and restrained 3D buildings where suitable geometry is available. A 2D/table alternative will support devices without usable WebGL. Any later animated vehicles will be labeled simulated unless based on actual permitted trajectories. [MapLibre's building example](https://maplibre.org/maplibre-gl-js/docs/examples/display-buildings-in-3d/) establishes the proposed rendering approach.
+The redesigned frontend uses an ivory workspace, charcoal navigation, lime accents and a dark 3D map. The login page includes an illustrative isometric city. Overview, network explorer, forecast history, model lab, reports, data sources and settings are implemented. Replay and chart selection update the selected historical forecast; users can download CSV history, export model evaluation JSON and print a mentor summary. A 2D/table alternative will support devices without usable WebGL. Any later animated vehicles will be labeled simulated unless based on actual permitted trajectories. [MapLibre's building example](https://maplibre.org/maplibre-gl-js/docs/examples/display-buildings-in-3d/) establishes the proposed rendering approach.
 
 ## One month schedule and review points
 
@@ -119,4 +130,4 @@ GitHub commits will capture meaningful completed changes. The desired 20+ daily 
 
 The planned submission consists of the source repository, reproducible setup instructions, data and model documentation, evaluation results, backend API, interactive 3D dashboard, final project report, and a short demonstration video. Deployment status and any unimplemented original requirements will be stated explicitly.
 
-The immediate next step is scope review alongside repository setup and data preparation. Development can begin on the core pipeline while the mentor considers the conditional requirements.
+The immediate next steps are mentor scope review, detailed error analysis, target-device checks and a hosting decision. Local account creation, cookie-backed sign-in and sign-out work, while email verification, password recovery and production deployment remain pending. The core forecasts remain accessible through an explicitly labeled public demo.
