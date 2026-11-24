@@ -17,7 +17,14 @@ const fields: Field[] = [
   { key: "temp", label: "Temperature", unit: "K", min: 180, max: 330, step: 1 },
   { key: "rain_1h", label: "Rainfall", unit: "mm", min: 0, max: 300, step: 1 },
   { key: "snow_1h", label: "Snowfall", unit: "mm", min: 0, max: 100, step: 1 },
-  { key: "clouds_all", label: "Cloud cover", unit: "%", min: 0, max: 100, step: 5 },
+  {
+    key: "clouds_all",
+    label: "Cloud cover",
+    unit: "%",
+    min: 0,
+    max: 100,
+    step: 5,
+  },
 ];
 
 export function WeatherScenario() {
@@ -41,7 +48,9 @@ export function WeatherScenario() {
     try {
       setResult(await runWeatherScenario(values));
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Scenario unavailable.");
+      setError(
+        reason instanceof Error ? reason.message : "Scenario unavailable.",
+      );
     } finally {
       setPending(false);
     }
@@ -53,7 +62,10 @@ export function WeatherScenario() {
         <div>
           <span className="caps">COUNTERFACTUAL LAB</span>
           <h2 id="scenario-title">Weather scenario simulator</h2>
-          <p>Change known weather inputs while traffic history and calendar stay fixed.</p>
+          <p>
+            Change known weather inputs while traffic history and calendar stay
+            fixed.
+          </p>
         </div>
         <span className="pill subtle">Experimental</span>
       </div>
@@ -80,7 +92,11 @@ export function WeatherScenario() {
           {pending ? "Running scenario…" : "Run scenario"}
         </button>
       </form>
-      {error && <p className="scenario-error" role="alert">{error}</p>}
+      {error && (
+        <p className="scenario-error" role="alert">
+          {error}
+        </p>
+      )}
       {result && (
         <div className="scenario-result" aria-live="polite">
           <div>
@@ -93,7 +109,10 @@ export function WeatherScenario() {
           </div>
           <div className={result.difference >= 0 ? "increase" : "decrease"}>
             <span>Change</span>
-            <strong>{result.difference >= 0 ? "+" : ""}{number(result.difference, 1)}</strong>
+            <strong>
+              {result.difference >= 0 ? "+" : ""}
+              {number(result.difference, 1)}
+            </strong>
           </div>
           <p>{result.disclaimer}</p>
         </div>
